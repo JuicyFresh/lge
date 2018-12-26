@@ -1,0 +1,102 @@
+<p id=QTRACKER><span style="font-size:35px;"><strong> < Q-Tracker > </strong></span>
+
+<p style="margin-top:10px;">
+	<span style="font-size:25px;"><strong> webOS4.5 SIC OVER DUE</strong></span>
+	<p class="UNIT">
+		<li class="filter">
+				<strong>filter :</strong> 
+project in ("Q Event 19") and filter = SIC.MEMBER AND  status in (OPEN, "In Progress", REOPENED, FIXREADY) and duedate < now()
+		</li>
+		<li class="comment">
+				<strong> comment : </strong>
+				Due-date가 지났습니다.  업데이트 부탁드립니다.
+				일정은 아래를 참고하세요.
+				*webOS4.5*
+     				SIC의 gld4tv CCC는 매주 목 입니다.
+					M16P3/O18은 branch out 되어 TVPM 이슈를 생성해야 합니다.
+	    	-시험
+			M16P3 : TBD
+			O18 : TBD
+		</li>
+	</p>
+</p>
+
+<p style="margin-top:35px;">
+	<span style="font-size:25px;"><strong> webOS4.5 SIC EMPTY DUE </strong></span>
+	<p class="UNIT">
+		<li class="filter">
+				<strong>filter :</strong> 
+				project in ("Q Event 19") AND filter = SIC.MEMBER and  status in (OPEN, "In Progress", REOPENED, FIXREADY) and duedate is empty
+		</li>
+		<li class="comment">
+				<strong> comment : </strong>
+				Due-date가 없습니다. 업데이트 부탁드립니다.
+				일정은 아래를 참고하세요.
+				*webOS4.5*
+     				gld4tv는 daily build 진행중이고 SIC의 gld4tv CCC는 매주 월/목 입니다.
+					M16P3는 branch out 되어 TVPM 이슈를 생성해야 합니다.
+	    		-시험
+				M16P3 : TBD
+				O18 : TBD
+		</li>
+	</p>
+</p>
+<p style="margin-top:35px;">
+	<span style="font-size:25px;"><strong> webOS4.5 SIC FixReady Check </strong></span>
+	<p class="UNIT">
+		<li class="filter">
+			<strong>filter :</strong> 
+			filter = SIC.WEBOS45.ALLCHIP.FILXREADY.CHECK
+		</li>
+		<li class="comment">
+			<strong>comment:</strong>
+				Due-date가 하루 전입니다.
+				due-date가 맞다면 FixReady로 변경해주시고
+				변동사항이 있다면 due-date를 변경해주세요.
+		</li>
+	</p>
+</p>
+
+<p style="margin-top:35px;">
+	<span style="font-size:25px;"><strong> webOS4.5 SIC ReOpen Check </strong></span>
+	<p class="UNIT">
+		<li class="filter">
+			<strong>filter :</strong>
+			 filter = SIC.WEBOS45.ALLCHIP.REOPEN.CHECK
+		</li>
+		<li class="comment">
+			<strong>comment:</strong>
+				이슈가 reopen되었습니다.
+				status와 due-date 변경/점검 부탁드립니다.
+		</li>
+	</p>
+</p>
+
+<p style="margin-top:35px;">
+	<span style="font-size:25px;"><strong> TBC Team (webOS4.5 / Over) </strong></span>
+	<p class="UNIT">
+		<li class="filter">
+			<strong>filter :</strong>
+			 project in ("Q Event 19") and (filter = BSP_CORE_VIDEO or filter = BSP_CORE_CDP or filter = BSP_CORE_SYSTEM) AND resolution = Unresolved and duedate < now()
+		</li>
+		<li class="comment">
+			<strong>comment :</strong>
+				Due-date가 지났습니다. 업데이트 부탁드립니다.
+		</li>
+	</p>
+</p>
+
+<p style="margin-top:35px;">
+	<span style="font-size:25px;"><strong> TBC Team (webOS4.5 / Empty) </strong></span>
+	<p class="UNIT">
+		<li class="filter">
+			<strong>filter :</strong>
+			 project in ("Q Event 19") and (filter = BSP_CORE_VIDEO or filter = BSP_CORE_CDP or filter = BSP_CORE_SYSTEM) AND resolution = Unresolved and duedate is empty
+		</li>
+		<li class="comment">
+			<strong>comment :</strong>
+			 Due-date가 없습니다. 업데이트 부탁드립니다.
+		</li>
+	</p>
+</p>
+</p>
