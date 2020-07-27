@@ -11,7 +11,8 @@ PW = getpass.getpass()
 harmony_server = 'https://harmony.lge.com:8443/issue'
 headers = {"Accept": "application/json", 'Content-Type':'application/json'}
 search_url = '/rest/api/2/search'
-
+changelog_url_1 = '/rest/api/2/issue/'
+changelog_url_2 = '?expand=changelog'
 
 def get_remoteLink(key):
     url = "https://harmony.lge.com:8443/issue/rest/api/2/issue/" + str(key) + '/remotelink'
@@ -41,22 +42,19 @@ def getSoc(project):
     else:
         return 'undefined'
 
-def getHistoryItems(tmp,option):
-    SERVER = harmony_server
-    issue = tmp['key']
-    url = SERVER + '/rest/api/2/issue/' + str(issue) + '?expand=changelog'
-    result = requests.get(url, params={'os_username': ID, 'os_password': PW}).json()
-
+def getHistoryItems(result,option):
     FINAL = None
     dueSet = set()
     assigneeList = list()
+    reopenCnt = 0
     for history in result['changelog']['histories']:
         for idx, subHistory in enumerate(history['items']):
+            category = subHistory['field']
             # 1. duedate
             if option == 'duedate':
                 if result['fields']['duedate'] != None: # 현재 설정된 duedate를 먼저 저장한다.
                     dueSet.add(result['fields']['duedate'])
-                if subHistory['field'] == 'duedate':    # history상 duedate를 저장한다.
+                if category == 'duedate':    # history상 duedate를 저장한다.
                     if subHistory['from'] != None:
                         dueSet.add(subHistory['from'])
                     dueSet.add(subHistory['to'])
@@ -65,7 +63,7 @@ def getHistoryItems(tmp,option):
 
             # 2. assignee
             if option == 'assignee':
-                if subHistory['field'] == 'assignee':
+                if category == 'assignee':
                     if idx == 0:
                         assigneeList.append(subHistory['from'])
                     if subHistory['toString'] != None and 'lge' not in subHistory['toString'] and 'WBS' not in subHistory['toString']:
@@ -74,6 +72,13 @@ def getHistoryItems(tmp,option):
                     FINAL = assigneeList
 
             # 3. Reopened Count
+            if option == 'reopenCnt':
+                if category == 'status':
+                    if subHistory['toString'] == 'Reopened':
+                        print('bingo')
+                        reopenCnt += 1
+                if len(history['items']) == idx + 1:
+                    FINAL = reopenCnt
 
 
 
@@ -95,6 +100,9 @@ def main():
     for jql in JQL:
         result = requests.get(SERVER + search_url, params={'jql': jql, 'os_username': ID, 'os_password': PW, 'fields': fields}).json()
         for issue in result['issues']:
+            url = SERVER + changelog_url_1 + str(issue['key']) + changelog_url_2
+            history = requests.get(url, params={'os_username': ID, 'os_password': PW}).json()
+
             field = issue['fields']
             tmp = dict()
             tmp['key']     = issue['key']
@@ -103,8 +111,9 @@ def main():
             tmp['soc']     = getSoc(tmp['project'])
             tmp['chip']    = field['customfield_13827'][0].lower()
             tmp['component'] = field['components'][0]['name']
-            tmp['duedate'] = getHistoryItems(tmp,'duedate')
-            tmp['assignee'] = getHistoryItems(tmp, 'assignee')
+            tmp['duedate'] = getHistoryItems(history,'duedate')
+            tmp['assignee'] = getHistoryItems(history, 'assignee')
+            tmp['reopenCnt'] = getHistoryItems(history, 'reopenCnt')
 
 
             final_list.append(tmp)
