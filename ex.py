@@ -1,12 +1,9 @@
-from jira import JIRA
-import re
-from collections import Counter
+# -*- coding: utf-8 -*-
 import sys
-
-sys.path.append('../lib')
-# import collabLib
-# import jiraLib
-# import logLib
+sys.path.append('./lib')
+import requests
+import json
+import getpass
 
 # 서버 주소
 qTracker_server = 'http://hlm.lge.com/qi'
@@ -14,16 +11,16 @@ dev_server = 'http://hlm.lge.com/issue'
 harmony_server = 'https://harmony.lge.com:8443/issue'
 
 ID = 'sangwoo.ahn'
-PW = '!324tmdqls'
+PW = getpass.getpass()
 # jira server read
 # jira = JIRA(dev_server, basic_auth=(ID, PW))
 # jira = JIRA(harmony_server, basic_auth=(ID, PW))
-jira = JIRA(qTracker_server, basic_auth=(ID, PW))
+# jira = JIRA(qTracker_server, basic_auth=(ID, PW))
 # LOG = logLib.log(ID)
 # jira = jiraLib.jira('HARMONY',    ID, PW, LOG)
 
 # jira project read
-projects = jira.projects()
+# projects = jira.projects()
 
 
 # issue read
@@ -108,4 +105,30 @@ def Chip():
     print(chip, chip[0])
 
 
-comments()
+def issueHistory(option):
+    SERVER = harmony_server
+    issue = 'WOSQRTK-15200'
+    url = SERVER + '/rest/api/2/issue/' + str(issue) + '?expand=changelog'
+    result = requests.get(url, params={'os_username': ID, 'os_password': PW}).json()
+
+    dueSet = set()
+    assigneeList = list()
+    fFirstAssignee = True
+    for history in result['changelog']['histories']:
+        for idx, subHistory in enumerate(history['items']):
+            # 1. duedate
+            if option == 'duedate':
+                if result['fields']['duedate'] != None:
+                    dueSet.add(result['fields']['duedate'])
+                if subHistory['field'] == 'duedate':
+                    if subHistory['from'] != None:
+                        dueSet.add(subHistory['from'])
+                    dueSet.add(subHistory['to'])
+                if len(history['items'])-1 == idx:
+                    print(len(history['items']), idx)
+
+
+
+            # 3. Reopened Count
+
+issueHistory('duedate')

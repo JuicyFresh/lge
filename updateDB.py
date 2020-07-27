@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
 sys.path.append('./lib')
-from jira import JIRA
 import requests
 import json
 import getpass
@@ -48,37 +47,38 @@ def getHistoryItems(tmp,option):
     url = SERVER + '/rest/api/2/issue/' + str(issue) + '?expand=changelog'
     result = requests.get(url, params={'os_username': ID, 'os_password': PW}).json()
 
+    FINAL = None
     dueSet = set()
     assigneeList = list()
-    fFirstAssignee = True
     for history in result['changelog']['histories']:
-        for subHistory in history['items']:
+        for idx, subHistory in enumerate(history['items']):
             # 1. duedate
             if option == 'duedate':
-                if result['fields']['duedate'] != None:
+                if result['fields']['duedate'] != None: # 현재 설정된 duedate를 먼저 저장한다.
                     dueSet.add(result['fields']['duedate'])
-                if subHistory['field'] == 'duedate':
+                if subHistory['field'] == 'duedate':    # history상 duedate를 저장한다.
                     if subHistory['from'] != None:
                         dueSet.add(subHistory['from'])
                     dueSet.add(subHistory['to'])
+                if len(history['items']) == idx+1:
+                    FINAL = list(dueSet)
 
             # 2. assignee
             if option == 'assignee':
                 if subHistory['field'] == 'assignee':
-                    if fFirstAssignee == True:
+                    if idx == 0:
                         assigneeList.append(subHistory['from'])
-                        fFirstAssignee = False
                     if subHistory['toString'] != None and 'lge' not in subHistory['toString'] and 'WBS' not in subHistory['toString']:
                         assigneeList.append(subHistory['to'])
+                if len(history['items']) == idx + 1:
+                    FINAL = assigneeList
 
             # 3. Reopened Count
 
 
+
             # if 'lge' not in result['fields']['assignee']:
-    if option == 'duedate':
-        return list(dueSet)
-    if option == 'assignee':
-        return assigneeList
+    return FINAL
 
 
 def main():
